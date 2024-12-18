@@ -1,0 +1,44 @@
+version: '3.4'
+
+services:
+  productswithrabbit:
+    image: ${DOCKER_REGISTRY-}productswithrabbit
+    build:
+      context: .
+      dockerfile: ProductsWithRabbit/Dockerfile
+
+  subscriber: &tally
+    image: ${DOCKER_REGISTRY-}subscriber
+    build:
+      context: .
+      dockerfile: Subscriber/Dockerfile
+    depends_on:
+     - "productswithrabbit"
+     - "rabbitmq"
+
+  subscriber1:
+    image: ${DOCKER_REGISTRY-}subscriber
+    build:
+      context: .
+      dockerfile: Subscriber/Dockerfile
+    depends_on:
+     - "productswithrabbit"
+     - "rabbitmq"
+  
+  subscriber2:
+    <<: *tally
+
+  rabbitmq: # login guest:guest
+    image: rabbitmq:3-management
+    hostname: "rabbitmq"
+    labels:
+      NAME: "rabbitmq"
+    ports:
+    - "4369:4369"
+    - "5671:5671"
+    - "5672:5672"
+    - "25672:25672"
+    - "15671:15671"
+    - "15672:15672"
+
+
